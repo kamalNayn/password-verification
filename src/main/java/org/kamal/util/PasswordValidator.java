@@ -2,68 +2,59 @@ package org.kamal.util;
 
 import org.kamal.exception.IncorrectPasswordException;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
+
 public class PasswordValidator {
 
-    /*
-        Validate Password
-     */
-    public static boolean isValidPassword(String password){
-        //conditionMet counter
-        int conditionMet = 0;
+    public static void validatePassword(String password){
+        //check if password is not null
+        if(password==null){
+            throw new IncorrectPasswordException("Password cannot be null");
+        }
 
+        //check if password has atleast one lowercase
+        if(!password.matches(".*[a-z].*")){
+            throw new IncorrectPasswordException("Password must contain atleast one lowercase letter");
+        }
+
+        //Thread of size 3
+        ExecutorService executorService = Executors.newFixedThreadPool(3);
+
+        //creating list of validations task
+        List<Callable<Boolean>> tasks = List.of(
+                () -> password.length()>8,
+                () -> password.matches(".*[A-Z].*"),
+                () -> password.matches(".*[0-9].*")
+        );
+        int conditionMets = 1; //as atleast one lowercase is true
+        List<String> failedConditions = new ArrayList<>();
         try{
-            //check if password is not null
-            if (password != null) {
-                conditionMet++;
-
-                // check password length should be larger than 8
-                if(password.length()<8){
-                    throw new IncorrectPasswordException("Password should be larger than 8 chars");
-                }else {
-                    conditionMet++;
-                }
-                int hasOneUpperCase = 0;
-                int hasOneLowerCase = 0;
-                int hasOneNumber = 0;
-
-                for(char c: password.toCharArray()){
-                    if (Character.isUpperCase(c)) {
-                        hasOneUpperCase++;
-                    } else if (Character.isLowerCase(c)) {
-                        hasOneLowerCase++;
-                    } else if (Character.isDigit(c)) {
-                        hasOneNumber++;
-                    }
-                }
-                //check if password has one lower case
-                if(hasOneLowerCase==0){
-                    throw new IncorrectPasswordException("Password should have one lowercase letter at least");
-                }else {
-                    conditionMet++;
-                }
-                //check if password has one upper case
-                if(hasOneUpperCase==0){
-                    throw new IncorrectPasswordException("Password should have one uppercase letter at least");
-                }else{
-                    conditionMet++;
-                }
-                //check if password has one number
-                if(hasOneNumber==0){
-                    throw new IncorrectPasswordException("Password should have one number at least");
-                }else {
-                    conditionMet++;
-                }
-                return true;
-            }else{
-                throw new IncorrectPasswordException("Password should not be null");
+            List<Future<Boolean>> results = executorService.invokeAll(tasks);
+            if(results.get(0).get()) {
+                conditionMets++;
+            } else {
+                failedConditions.add("Password should be larger than 8 chars");
             }
-        }catch (IncorrectPasswordException e){
-            //check if atleast 3 condition is met
-            if(conditionMet>=3){
-                return true;
-            }else{
-                throw e;
+            if(results.get(1).get()) {
+                conditionMets++;
+            } else {
+                failedConditions.add("Password should have atleast 1 uppercase");
             }
+            if(results.get(2).get()) {
+                conditionMets++;
+            } else {
+                failedConditions.add("Password should have atleast 1 number");
+            }
+
+        } catch (InterruptedException | ExecutionException e) {
+            throw new IncorrectPasswordException("Validation failed due to unexpected error");
+        }finally {
+            executorService.shutdown();
+        }
+        if(conditionMets<3){
+            throw new IncorrectPasswordException("Password not met these conditions\n"+String.join("\n", failedConditions));
         }
     }
 }
