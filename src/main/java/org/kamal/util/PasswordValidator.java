@@ -35,16 +35,16 @@ public class PasswordValidator {
                         hasOneNumber++;
                     }
                 }
-                //check if password has one upper case
-                if(hasOneUpperCase==0){
-                    throw new IncorrectPasswordException("Password should have one uppercase letter at least");
-                }else{
-                    conditionMet++;
-                }
                 //check if password has one lower case
                 if(hasOneLowerCase==0){
                     throw new IncorrectPasswordException("Password should have one lowercase letter at least");
                 }else {
+                    conditionMet++;
+                }
+                //check if password has one upper case
+                if(hasOneUpperCase==0){
+                    throw new IncorrectPasswordException("Password should have one uppercase letter at least");
+                }else{
                     conditionMet++;
                 }
                 //check if password has one number
@@ -53,11 +53,12 @@ public class PasswordValidator {
                 }else {
                     conditionMet++;
                 }
-                return conditionMet >= 3;
+                return true;
             }else{
                 throw new IncorrectPasswordException("Password should not be null");
             }
         }catch (IncorrectPasswordException e){
+            //check if atleast 3 condition is met
             if(conditionMet>=3){
                 return true;
             }else{
