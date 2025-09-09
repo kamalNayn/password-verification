@@ -3,7 +3,6 @@ package org.kamal.util;
 import org.junit.Test;
 import org.kamal.exception.IncorrectPasswordException;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 public class PasswordValidatorTest {
 
