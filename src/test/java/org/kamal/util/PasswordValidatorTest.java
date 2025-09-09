@@ -1,51 +1,60 @@
 package org.kamal.util;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.kamal.exception.IncorrectPasswordException;
+import org.kamal.model.ValidationResult;
+import org.kamal.rules.*;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PasswordValidatorTest {
 
-    @Test(expected = IncorrectPasswordException.class)
-    public void validatePasswordNull(){
-        String password = null;
-        PasswordValidator.validatePassword(password);
+    PasswordValidator passwordValidator;
+    @Before
+    public void setUp() throws Exception {
+        List<PasswordRule> rules = List.of(
+                new LengthRule(),
+                new UppercaseRule(),
+                new NumberRule()
+        );
+        PasswordRule lowerCaseRule = new LowercaseRule();
+        passwordValidator = new PasswordValidator(rules, lowerCaseRule, 3);
     }
 
-    @Test(expected = IncorrectPasswordException.class)
-    public void validatePasswordLengthLessThan8(){
-        String password = "abc";
-        PasswordValidator.validatePassword(password);
-    }
-
-    @Test(expected = IncorrectPasswordException.class)
-    public void validatePasswordAllLowerCase(){
-        String password = "password";
-        PasswordValidator.validatePassword(password);
-    }
-
-    @Test(expected = IncorrectPasswordException.class)
-    public void validatePasswordAllUpperCase(){
-        String password = "PASSWORD";
-        PasswordValidator.validatePassword(password);
-    }
-
-    @Test(expected = IncorrectPasswordException.class)
-    public void validatePasswordAllNumber(){
-        String password = "12345678";
-        PasswordValidator.validatePassword(password);
+    @After
+    public void tearDown() throws Exception {
+        passwordValidator = null;
     }
 
     @Test
-    public void validatePassword(){
-        String password = "Passwo4d";
-        PasswordValidator.validatePassword(password);
+    public void validatePassword() {
+        String password = "ABCDE";
+        ValidationResult validationResult = passwordValidator.validatePassword(password);
+        assertFalse(validationResult.isValid());
     }
 
-    @Test(expected = IncorrectPasswordException.class)
-    public void validatePasswordOneLowerOneUpper(){
-        String password = "Password";
-        PasswordValidator.validatePassword(password);
+    @Test
+    public void validatePassword2() {
+        String password = "pass";
+        ValidationResult validationResult = passwordValidator.validatePassword(password);
+        assertFalse(validationResult.isValid());
+    }
+
+    @Test
+    public void validatePassword3() {
+        String password = "pAss";
+        ValidationResult validationResult = passwordValidator.validatePassword(password);
+        assertFalse(validationResult.isValid());
+    }
+
+    @Test
+    public void validatePassword4() {
+        String password = "pAssW0rd";
+        ValidationResult validationResult = passwordValidator.validatePassword(password);
+        assertTrue(validationResult.isValid());
     }
 }
