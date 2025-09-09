@@ -18,5 +18,28 @@ Optimized by validating each rules parallely.
 ## Usage
 
 ```java
-PasswordValidator.validate(password);
+List<PasswordRule> rules = List.of(
+                new LengthRule(),
+                new UppercaseRule(),
+                new NumberRule()
+                );
+        PasswordRule lowerCaseRule = new LowercaseRule();
+        PasswordValidator passwordValidator = new PasswordValidator(rules, lowerCaseRule, 3);
+
+        String[] passwords = {
+                "abc",
+                "Abc124",
+                "password123",
+                "12345678"
+        };
+        for(String password: passwords){
+            ValidationResult validationResult = passwordValidator.validatePassword(password);
+            if(validationResult.isValid()){
+                System.out.println("Password: " +password+" is valid!");
+            }else{
+                System.out.println("Password: " +password+" is Invalid! Below failed rules:\n"
+                        +String.join("\n", validationResult.getFailedMessages()));
+            }
+        }
+
 
