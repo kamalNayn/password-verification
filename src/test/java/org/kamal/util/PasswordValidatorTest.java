@@ -8,48 +8,44 @@ import static org.junit.jupiter.api.Assertions.*;
 public class PasswordValidatorTest {
 
     @Test(expected = IncorrectPasswordException.class)
-    public void isValidPasswordNull(){
+    public void validatePasswordNull(){
         String password = null;
-        PasswordValidator.isValidPassword(password);
+        PasswordValidator.validatePassword(password);
     }
 
     @Test(expected = IncorrectPasswordException.class)
-    public void isValidPasswordLengthLessThan8(){
+    public void validatePasswordLengthLessThan8(){
         String password = "abc";
-        PasswordValidator.isValidPassword(password);
+        PasswordValidator.validatePassword(password);
     }
 
-    @Test
-    public void isValidPasswordAllLowerCase(){
+    @Test(expected = IncorrectPasswordException.class)
+    public void validatePasswordAllLowerCase(){
         String password = "password";
-        boolean validPassword = PasswordValidator.isValidPassword(password);
-        assertTrue(validPassword);
+        PasswordValidator.validatePassword(password);
     }
 
     @Test(expected = IncorrectPasswordException.class)
-    public void isValidPasswordAllUpperCase(){
+    public void validatePasswordAllUpperCase(){
         String password = "PASSWORD";
-        PasswordValidator.isValidPassword(password);
+        PasswordValidator.validatePassword(password);
     }
 
     @Test(expected = IncorrectPasswordException.class)
-    public void isValidPasswordAllNumber(){
+    public void validatePasswordAllNumber(){
         String password = "12345678";
-        PasswordValidator.isValidPassword(password);
+        PasswordValidator.validatePassword(password);
     }
 
     @Test
-    public void isValidPassword(){
+    public void validatePassword(){
         String password = "Passwo4d";
-        boolean validPassword = PasswordValidator.isValidPassword(password);
-        assertTrue(validPassword);
+        PasswordValidator.validatePassword(password);
     }
 
-    @Test
-    public void isValidPasswordOneLowerOneUpper(){
+    @Test(expected = IncorrectPasswordException.class)
+    public void validatePasswordOneLowerOneUpper(){
         String password = "Password";
-        boolean validPassword = PasswordValidator.isValidPassword(password);
-        assertTrue(validPassword);
-
+        PasswordValidator.validatePassword(password);
     }
 }
