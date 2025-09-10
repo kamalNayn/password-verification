@@ -1,20 +1,20 @@
 package org.kamal.rules;
 
 
-public class NumberRule implements PasswordRule {
+public class LengthRule implements PasswordRule {
 
     @Override
     public boolean validate(String password) {
-        return password != null && password.matches(".*[0-9].*");
+        return password != null && password.length() > 8;
     }
 
     @Override
     public String getFailureMessage() {
-        return "Must contain at least one number";
+        return "Password must be longer than 8 characters.";
     }
 
     @Override
     public String getName() {
-        return "NumberRule";
+        return "LengthRule";
     }
 }

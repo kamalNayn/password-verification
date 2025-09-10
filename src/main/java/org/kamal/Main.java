@@ -1,23 +1,21 @@
 package org.kamal;
 
 import org.kamal.exception.IncorrectPasswordException;
-import org.kamal.model.ValidationResult;
 import org.kamal.rules.*;
 import org.kamal.util.PasswordValidator;
 
 import java.util.List;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
         List<PasswordRule> rules = List.of(
+                new NotNullRule(),
+                new LowercaseRule(),
                 new LengthRule(),
                 new UppercaseRule(),
                 new NumberRule()
                 );
-        PasswordRule lowerCaseRule = new LowercaseRule();
-        PasswordValidator passwordValidator = new PasswordValidator(rules, lowerCaseRule, 3);
+        PasswordValidator passwordValidator = new PasswordValidator(rules, 3);
 
         String[] passwords = {
                 "abc",
@@ -25,13 +23,17 @@ public class Main {
                 "password123",
                 "12345678"
         };
-        for(String password: passwords){
-            ValidationResult validationResult = passwordValidator.validatePassword(password);
-            if(validationResult.isValid()){
-                System.out.println("Password: " +password+" is valid!");
-            }else{
-                System.out.println("Password: " +password+" is Invalid! Below failed rules:\n"
-                        +String.join("\n", validationResult.getFailedMessages()));
+        for (String password : passwords) {
+            System.out.println("🔑 Testing password: " + password);
+            try {
+                boolean isValid = passwordValidator.validate(password);
+                if (isValid) {
+                    System.out.println("✅ Password is valid!\n");
+                }
+            } catch (IncorrectPasswordException ex) {
+                System.out.println("❌ Password validation failed:");
+                ex.getErrorMessages().forEach(msg -> System.out.println("   - " + msg));
+                System.out.println();
             }
         }
     }

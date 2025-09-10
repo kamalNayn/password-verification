@@ -1,20 +1,20 @@
 package org.kamal.rules;
 
 
-public class NumberRule implements PasswordRule {
+public class LowercaseRule implements PasswordRule {
 
     @Override
     public boolean validate(String password) {
-        return password != null && password.matches(".*[0-9].*");
+        return password != null && password.matches(".*[a-z].*");
     }
 
     @Override
     public String getFailureMessage() {
-        return "Must contain at least one number";
+        return "Must contain at least one lowercase";
     }
 
     @Override
     public String getName() {
-        return "NumberRule";
+        return "LowercaseRule";
     }
 }
