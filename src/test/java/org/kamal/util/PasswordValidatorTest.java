@@ -4,12 +4,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kamal.exception.IncorrectPasswordException;
-import org.kamal.model.ValidationResult;
 import org.kamal.rules.*;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PasswordValidatorTest {
 
@@ -17,12 +17,13 @@ public class PasswordValidatorTest {
     @Before
     public void setUp() throws Exception {
         List<PasswordRule> rules = List.of(
+                new NotNullRule(),
+                new LowercaseRule(),
                 new LengthRule(),
                 new UppercaseRule(),
                 new NumberRule()
         );
-        PasswordRule lowerCaseRule = new LowercaseRule();
-        passwordValidator = new PasswordValidator(rules, lowerCaseRule, 3);
+        passwordValidator = new PasswordValidator(rules, 3);
     }
 
     @After
@@ -30,31 +31,30 @@ public class PasswordValidatorTest {
         passwordValidator = null;
     }
 
-    @Test
+    @Test(expected = IncorrectPasswordException.class)
     public void validatePassword() {
         String password = "ABCDE";
-        ValidationResult validationResult = passwordValidator.validatePassword(password);
-        assertFalse(validationResult.isValid());
+        passwordValidator.validate(password);
     }
 
-    @Test
+    @Test(expected = IncorrectPasswordException.class)
     public void validatePassword2() {
         String password = "pass";
-        ValidationResult validationResult = passwordValidator.validatePassword(password);
-        assertFalse(validationResult.isValid());
+        boolean valid= passwordValidator.validate(password);
+        assertFalse(valid);
     }
 
     @Test
     public void validatePassword3() {
         String password = "pAss";
-        ValidationResult validationResult = passwordValidator.validatePassword(password);
-        assertFalse(validationResult.isValid());
+        boolean valid= passwordValidator.validate(password);
+        assertTrue(valid);
     }
 
     @Test
     public void validatePassword4() {
         String password = "pAssW0rd";
-        ValidationResult validationResult = passwordValidator.validatePassword(password);
-        assertTrue(validationResult.isValid());
+        boolean valid= passwordValidator.validate(password);
+        assertTrue(valid);
     }
 }

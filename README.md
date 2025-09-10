@@ -19,12 +19,13 @@ Optimized by validating each rules parallely.
 
 ```java
 List<PasswordRule> rules = List.of(
+                new NotNullRule(),
+                new LowercaseRule(),
                 new LengthRule(),
                 new UppercaseRule(),
                 new NumberRule()
                 );
-        PasswordRule lowerCaseRule = new LowercaseRule();
-        PasswordValidator passwordValidator = new PasswordValidator(rules, lowerCaseRule, 3);
+        PasswordValidator passwordValidator = new PasswordValidator(rules, 3);
 
         String[] passwords = {
                 "abc",
@@ -32,14 +33,17 @@ List<PasswordRule> rules = List.of(
                 "password123",
                 "12345678"
         };
-        for(String password: passwords){
-            ValidationResult validationResult = passwordValidator.validatePassword(password);
-            if(validationResult.isValid()){
-                System.out.println("Password: " +password+" is valid!");
-            }else{
-                System.out.println("Password: " +password+" is Invalid! Below failed rules:\n"
-                        +String.join("\n", validationResult.getFailedMessages()));
+        for (String password : passwords) {
+            System.out.println("🔑 Testing password: " + password);
+            try {
+                boolean isValid = passwordValidator.validate(password);
+                if (isValid) {
+                    System.out.println("✅ Password is valid!\n");
+                }
+            } catch (IncorrectPasswordException ex) {
+                System.out.println("❌ Password validation failed:");
+                ex.getErrorMessages().forEach(msg -> System.out.println("   - " + msg));
+                System.out.println();
             }
         }
-
 
